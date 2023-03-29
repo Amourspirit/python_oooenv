@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "oooenv"
-version = "0.1.0"
+version = "0.0.2"
 description = "Configures a project environment for LibreOffice UNO."
 authors = [":Barry-Thomas-Paul: Moss <vibrationoflife@protonmail.com>"]
 keywords = ["libreoffice", "macro", "uno", "ooouno"]
@@ -11,7 +11,13 @@ license = "MIT"
 readme = "README.md"
 
 [tool.poetry.scripts]
-oooscript = 'oooenv.cli.main:main'
+oooenv = 'oooenv.cli.main:main'
+
+[[tool.poetry.source]]
+name = "pypi-test"
+url = "https://test.pypi.org/legacy/"
+default = false
+secondary = false
 
 [tool.poetry.dependencies]
 python = "^3.7"
