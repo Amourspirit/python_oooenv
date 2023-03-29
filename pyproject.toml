@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "oooenv"
-version = "0.0.3"
+version = "0.1.0"
 description = "Configures a project environment for LibreOffice UNO."
 authors = [":Barry-Thomas-Paul: Moss <vibrationoflife@protonmail.com>"]
 keywords = ["libreoffice", "macro", "uno", "ooouno"]
@@ -24,7 +24,7 @@ python = "^3.7"
 
 
 [tool.poetry.group.dev.dependencies]
-black = "^23.3.0"
+black = ">=23.3.0"
 
 [build-system]
 requires = ["poetry-core"]
