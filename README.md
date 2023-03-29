@@ -6,6 +6,14 @@ A project as [OOO Development Tools](https://python-ooo-dev-tools.readthedocs.io
 
 See also [OOO Development Tools - Develop Docs](https://python-ooo-dev-tools.readthedocs.io/en/latest/dev_docs/dev_notes.html)
 
+## Installation
+
+**oooenv** [PyPI](https://pypi.org/project/oooenv)
+
+```
+pip install oooenv
+```
+
 ## Usage
 
 ### Linux/Mac
