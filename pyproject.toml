@@ -1,0 +1,28 @@
+[tool.poetry]
+name = "oooenv"
+version = "0.1.0"
+description = "Configures a project environment for LibreOffice UNO."
+authors = [":Barry-Thomas-Paul: Moss <vibrationoflife@protonmail.com>"]
+keywords = ["libreoffice", "macro", "uno", "ooouno"]
+homepage = "https://github.com/Amourspirit/python_oooenv"
+documentation = "https://github.com/Amourspirit/python_oooenv"
+repository = "https://github.com/Amourspirit/python_oooenv"
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.7"
+
+
+[tool.poetry.group.dev.dependencies]
+black = "^23.3.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.ruff]
+extended-select=["ANN", "C4", "N", "SIM", "TCH"]
+ignore=["E501"]
+show-fixes=true
+target="py37"

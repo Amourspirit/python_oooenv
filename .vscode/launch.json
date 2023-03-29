@@ -1,0 +1,72 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python: Current File",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "justMyCode": true
+        },
+        {
+            "name": "Python: Not Headless",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "env": {
+                "NO_HEADLESS": "1"
+            }
+        },
+        {
+            "name": "Python: Current All Code",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "justMyCode": false
+        },
+        {
+            "name": "Python: Sphinx Docs Linux",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/.venv/bin/sphinx-build",
+            "cwd": "${workspaceFolder}/docs",
+            "args": [
+                "-E",
+                "-b",
+                "html",
+                "-d",
+                "_build/doctrees",
+                ".",
+                "_build/html"
+            ],
+            "console": "integratedTerminal",
+            "justMyCode": false
+        },
+        {
+            "name": "Python: Sphinx Docs Windows",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/.venv/Scripts/sphinx-build.exe",
+            "cwd": "${workspaceFolder}/docs",
+            "args": [
+                "-E",
+                "-b",
+                "html",
+                "-d",
+                "_build/doctrees",
+                ".",
+                "_build/html"
+            ],
+            "console": "integratedTerminal",
+            "justMyCode": false
+        }
+
+    ]
+}
