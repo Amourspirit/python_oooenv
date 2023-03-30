@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "oooenv"
-version = "0.0.4"
+version = "0.1.1"
 description = "Configures a project environment for LibreOffice UNO."
 authors = [":Barry-Thomas-Paul: Moss <vibrationoflife@protonmail.com>"]
 keywords = ["libreoffice", "macro", "uno", "ooouno"]
