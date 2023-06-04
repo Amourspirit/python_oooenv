@@ -1,14 +1,25 @@
 [tool.poetry]
 name = "oooenv"
 version = "0.2.0"
-description = "Configures a project environment for LibreOffice UNO."
+description = "Configures a project python environment for LibreOffice UNO."
 authors = [":Barry-Thomas-Paul: Moss <vibrationoflife@protonmail.com>"]
-keywords = ["libreoffice", "macro", "uno", "ooouno"]
+keywords = ["libreoffice", "macro", "uno", "ooouno", "venv"]
 homepage = "https://github.com/Amourspirit/python_oooenv"
 documentation = "https://github.com/Amourspirit/python_oooenv"
 repository = "https://github.com/Amourspirit/python_oooenv"
 license = "MIT"
 readme = "README.md"
+classifiers = [
+    "Topic :: Office/Business",
+    "Operating System :: OS Independent",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+]
 
 [tool.poetry.scripts]
 oooenv = 'oooenv.cli.main:main'
@@ -23,7 +34,7 @@ name = "PyPI"
 priority = "primary"
 
 [tool.poetry.dependencies]
-python = "^3.7"
+python = "^3.8"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -37,4 +48,4 @@ build-backend = "poetry.core.masonry.api"
 extended-select=["ANN", "C4", "N", "SIM", "TCH"]
 ignore=["E501"]
 show-fixes=true
-target="py37"
+target="py38"

@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
+from __future__ import annotations
+import importlib.metadata
 import argparse
 import sys
 import os
@@ -8,6 +10,7 @@ from oooenv.cmds import uno_lnk, manage_env_cfg
 from oooenv.utils import local_paths
 
 # region parser
+
 # region        Create Parsers
 
 
@@ -17,7 +20,24 @@ def _create_parser(name: str) -> argparse.ArgumentParser:
 
 # endregion     Create Parsers
 
-# region        process arg command
+# region Process Sub Commands
+
+
+def _args_process_cmd(a_parser: argparse.ArgumentParser, args: argparse.Namespace) -> None:
+    if args.command == "cmd-link":
+        _args_action_cmd_link(a_parser=a_parser, args=args)
+    elif args.command == "env":
+        _args_action_cmd_toggle_env(a_parser=a_parser, args=args)
+    elif args.command == "info" and sys.platform == "win32":
+        _args_action_cmd_info_win(a_parser=a_parser, args=args)
+    else:
+        a_parser.print_help()
+
+
+# endregion Process Sub Commands
+
+
+# region command link
 def _args_cmd_link(parser: argparse.ArgumentParser) -> None:
     add_grp = parser.add_argument_group()
     add_grp.add_argument(
@@ -47,6 +67,20 @@ def _args_cmd_link(parser: argparse.ArgumentParser) -> None:
     )
 
 
+def _args_action_cmd_link(a_parser: argparse.ArgumentParser, args: argparse.Namespace) -> None:
+    if not (args.add or args.remove):
+        a_parser.error("No action requested, add --add or --remove")
+    if args.add:
+        uno_lnk.add_links(args.src_dir)
+    elif args.remove:
+        uno_lnk.remove_links()
+
+
+# endregion command link
+
+# region process env commands
+
+
 def _args_cmd_toggle_evn(parser: argparse.ArgumentParser) -> None:
     parser.add_argument(
         "-t",
@@ -67,20 +101,19 @@ def _args_cmd_toggle_evn(parser: argparse.ArgumentParser) -> None:
     parser.add_argument(
         "-c",
         "--custom-env",
-        help="Set a custom environment. cfg file must must be manually configured.",
+        help="Set a custom environment. cfg file must exist and be manually configured. Value is suffix of cfg file. For example: -c myenv will use pyenv_myenv.cfg",
         action="store",
         dest="custom_env",
         required=False,
     )
-
-
-def _args_action_cmd_link(a_parser: argparse.ArgumentParser, args: argparse.Namespace) -> None:
-    if not (args.add or args.remove):
-        a_parser.error("No action requested, add --add or --remove")
-    if args.add:
-        uno_lnk.add_links(args.src_dir)
-    elif args.remove:
-        uno_lnk.remove_links()
+    parser.add_argument(
+        "-v",
+        "--version",
+        help="Displays the current version of LiberOffice Python. This is parsed from LibreOffice Python executable.",
+        action="store_true",
+        dest="lo_py_version",
+        default=False,
+    )
 
 
 def _args_action_cmd_toggle_env(a_parser: argparse.ArgumentParser, args: argparse.Namespace) -> None:
@@ -96,18 +129,56 @@ def _args_action_cmd_toggle_env(a_parser: argparse.ArgumentParser, args: argpars
         return
     if args.custom_env:
         manage_env_cfg.toggle_cfg(suffix=args.custom_env)
+        return
 
 
-def _args_process_cmd(a_parser: argparse.ArgumentParser, args: argparse.Namespace) -> None:
-    if args.command == "cmd-link":
-        _args_action_cmd_link(a_parser=a_parser, args=args)
-    elif args.command == "env":
-        _args_action_cmd_toggle_env(a_parser=a_parser, args=args)
-    else:
-        a_parser.print_help()
+# endregion process env commands
 
 
-# endregion        process arg command
+# region Info Windows
+def _args_cmd_info_win(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument(
+        "-v",
+        "--version",
+        help="Displays the current version of LiberOffice Python. This is parsed from LibreOffice Python executable.",
+        action="store_true",
+        dest="lo_py_version",
+        default=False,
+    )
+
+
+def _args_action_cmd_info_win(a_parser: argparse.ArgumentParser, args: argparse.Namespace) -> None:
+    if args.lo_py_version:
+        ver = manage_env_cfg.get_uno_python_ver()
+        print(ver)
+        return
+
+
+# endregion Info Windows
+
+
+# region process arg command for global
+def _args_cmd_global(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument(
+        "-v",
+        "--version",
+        help="Show the current version of oooenv.",
+        action="store_true",
+        dest="show_version",
+        default=False,
+    )
+
+
+def _args_action_global(a_parser: argparse.ArgumentParser, args: argparse.Namespace) -> str | None:
+    # sourcery skip: assign-if-exp, reintroduce-else
+    if args.show_version:
+        # return importlib.metadata.version(__package__ or __name__)
+        return importlib.metadata.version("oooenv")
+    return None
+
+
+# endregion process arg command for global
+
 # endregion parser
 
 
@@ -117,6 +188,11 @@ def main() -> int:
     parser = _create_parser("main")
     subparser = parser.add_subparsers(dest="command")
 
+    # region Global
+    _args_cmd_global(parser=parser)
+    # endregion Global
+
+    # region OS Specific Commands
     if os.name != "nt":
         # linking is not useful in Windows.
         cmd_link = subparser.add_parser(
@@ -131,10 +207,21 @@ def main() -> int:
             help="Manage Virtual Environment configuration.",
         )
         _args_cmd_toggle_evn(parser=cmd_env_toggle)
+        cmd_win_info = subparser.add_parser(
+            name="info",
+            help="LibreOffice information.",
+        )
+        _args_cmd_info_win(parser=cmd_win_info)
+
+    # endregion OS Specific Commands
 
     # region Read Args
     args = parser.parse_args()
+    if global_action := _args_action_global(a_parser=parser, args=args):
+        print(global_action)
+        return 0
     # endregion Read Args
+
     _args_process_cmd(a_parser=parser, args=args)
     return 0
 

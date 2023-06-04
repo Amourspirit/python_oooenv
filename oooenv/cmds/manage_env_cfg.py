@@ -34,7 +34,11 @@ def get_uno_python_exe() -> str:
 
 
 def get_uno_python_ver() -> Version:
-    """Gets Uno Python Version"""
+    """
+    Gets Uno Python Version
+
+    Raises: Exception if not on Windows.
+    """
     python_exe = get_uno_python_exe()
     output = subprocess.check_output([python_exe, "--version"]).decode("UTF8").strip()
     # something like Python 3.8.10
