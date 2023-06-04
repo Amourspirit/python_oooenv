@@ -59,7 +59,7 @@ def _args_cmd_toggle_evn(parser: argparse.ArgumentParser) -> None:
     parser.add_argument(
         "-u",
         "--uno-env",
-        help="Displayes if the current Virtual Environment is UNO Environment.",
+        help="Displays if the current Virtual Environment is UNO Environment.",
         action="store_true",
         dest="uno_env",
         default=False,
@@ -69,7 +69,7 @@ def _args_cmd_toggle_evn(parser: argparse.ArgumentParser) -> None:
         "--custom-env",
         help="Set a custom environment. cfg file must must be manually configured.",
         action="store",
-        dest="cusom_env",
+        dest="custom_env",
         required=False,
     )
 
@@ -94,8 +94,8 @@ def _args_action_cmd_toggle_env(a_parser: argparse.ArgumentParser, args: argpars
     if args.toggle_env:
         manage_env_cfg.toggle_cfg()
         return
-    if args.cusom_env:
-        manage_env_cfg.toggle_cfg(suffix=args.cusom_env)
+    if args.custom_env:
+        manage_env_cfg.toggle_cfg(suffix=args.custom_env)
 
 
 def _args_process_cmd(a_parser: argparse.ArgumentParser, args: argparse.Namespace) -> None:
@@ -113,7 +113,7 @@ def _args_process_cmd(a_parser: argparse.ArgumentParser, args: argparse.Namespac
 
 def main() -> int:
     os.environ["project_root"] = str(Path(__file__).parent)
-    os.environ["env-site-packages"] = str(local_paths.get_site_packeges_dir())
+    os.environ["env-site-packages"] = str(local_paths.get_site_packages_dir())
     parser = _create_parser("main")
     subparser = parser.add_subparsers(dest="command")
 

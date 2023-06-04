@@ -26,6 +26,7 @@ def get_uno_python_exe() -> str:
     Raises:
         Exception: If not on Windows.
     """
+    # sourcery skip: raise-specific-error
     if sys.platform != "win32":
         raise Exception("Method only support Windows")
     p = Path(uno_paths.get_soffice_install_path(), "program", "python.exe")
@@ -52,7 +53,7 @@ def read_pyvenv_cfg(fnm: str = "pyvenv.cfg") -> dict:
         # chain generator
         # remove empty lines
         data = (row for row in data if row)
-        # each line should now be key value pairs seperated by =
+        # each line should now be key value pairs separated by =
         for row in data:
             key, value = row.split("=")
             result[key.strip()] = value.strip()
@@ -80,10 +81,8 @@ def backup_cfg() -> None:
 
 
 def _save_config(cfg: dict, fnm: str = "pyvenv.cfg"):
-    lst = []
-    for k, v in cfg.items():
-        lst.append(f"{k} = {v}")
-    if len(lst) > 0:
+    lst = [f"{k} = {v}" for k, v in cfg.items()]
+    if lst:
         lst.append("")
     f_out = _get_venv_path() / fnm
     with open(f_out, "w") as file:
@@ -118,49 +117,50 @@ def toggle_cfg(suffix: str = "") -> None:
 
     uno_cfg = env_path / "pyvenv_uno.cfg"
     if not uno_cfg.exists():
-        # need to create the file.
-        ver = str(get_uno_python_ver())
-        hm = _get_lo_path()
-        if "version" in cfg:
-            del cfg["version"]
-        cfg["home"] = hm
-        cfg["implementation"] = "CPython"
-        cfg["version_info"] = f"{ver}.final.0"
-        cfg["include-system-site-packages"] = "false"
-        cfg["base-prefix"] = f"{hm}\\python-core-{ver}"
-        cfg["base-exec-prefix"] = f"{hm}\\python-core-{ver}"
-        cfg["base-executable"] = f"{hm}\\python.exe"
-        _save_config(cfg=cfg, fnm="pyvenv_uno.cfg")
-
+        _set_config_save(cfg)
     src = env_path / "pyvenv_uno.cfg"
     dst = env_path / "pyvenv.cfg"
     local_paths.copy_file(src=src, dst=dst)
     print("Set to UNO Environment")
 
 
+def _set_config_save(cfg):
+    # need to create the file.
+    ver = str(get_uno_python_ver())
+    hm = _get_lo_path()
+    if "version" in cfg:
+        del cfg["version"]
+    cfg["home"] = hm
+    cfg["implementation"] = "CPython"
+    cfg["version_info"] = f"{ver}.final.0"
+    cfg["include-system-site-packages"] = "false"
+    cfg["base-prefix"] = f"{hm}\\python-core-{ver}"
+    cfg["base-exec-prefix"] = f"{hm}\\python-core-{ver}"
+    cfg["base-executable"] = f"{hm}\\python.exe"
+    _save_config(cfg=cfg, fnm="pyvenv_uno.cfg")
+
+
 def _get_lo_path() -> str:
     lo_path = os.environ.get("ODEV_CONN_SOFFICE", None)
     if lo_path:
         index = lo_path.rfind("program")
-        if index > -1:
-            lo_path = lo_path[: index + 7]
-        else:
-            lo_path = None
+        lo_path = lo_path[: index + 7] if index > -1 else None
     if not lo_path:
         lo_path = str(uno_paths.get_soffice_install_path() / "program")
     return lo_path
 
 
 def _get_venv_path() -> Path:
-    vpath = os.environ.get("VIRTUAL_ENV", None)
-    if vpath is None:
+    v_path = os.environ.get("VIRTUAL_ENV", None)
+    if v_path is None:
         raise ValueError("Unable to get Virtual Environment Path")
-    return Path(vpath)
+    return Path(v_path)
 
 
 def _get_pyvenv_cfg_path(fnm: str = "pyvenv.cfg") -> Path:
-    vpath = _get_venv_path()
-    pyvenv_cfg = Path(vpath, fnm)
+    # sourcery skip: raise-specific-error
+    v_path = _get_venv_path()
+    pyvenv_cfg = Path(v_path, fnm)
     if not pyvenv_cfg.exists():
         raise FileNotFoundError(str(pyvenv_cfg))
     if not pyvenv_cfg.is_file():

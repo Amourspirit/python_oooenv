@@ -120,5 +120,19 @@
             ]
         }
     ],
-    "iis.configDir": ""
+    "iis.configDir": "",
+    "cSpell.words": [
+        "cmds",
+        "endregion",
+        "mkdirp",
+        "ODEV",
+        "ommited",
+        "oooenv",
+        "PROGRAMFILES",
+        "pyvenv",
+        "scriptforge",
+        "soffice",
+        "sourcery",
+        "unohelper"
+    ]
 }
