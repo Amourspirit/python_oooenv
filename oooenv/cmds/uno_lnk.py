@@ -19,6 +19,7 @@ from ..utils import uno_paths
 
 
 def add_links(uno_src_dir: Optional[str] = None):
+    # sourcery skip: extract-duplicate-method
     if isinstance(uno_src_dir, str):
         str_cln = uno_src_dir.strip()
         if len(str_cln) == 0:
@@ -31,9 +32,9 @@ def add_links(uno_src_dir: Optional[str] = None):
                 raise NotADirectoryError(f"UNO source is not a Directory: {uno_src_dir}")
     else:
         p_uno_dir = uno_paths.get_uno_path()
-    p_site_dir = local_paths.get_site_packeges_dir()
+    p_site_dir = local_paths.get_site_packages_dir()
     if p_site_dir is None:
-        print("Unable to find site_packages direct in virtual enviornment")
+        print("Unable to find site_packages direct in virtual environment")
         return
 
     p_uno = Path(p_uno_dir, "uno.py")
@@ -69,27 +70,27 @@ def add_links(uno_src_dir: Optional[str] = None):
     else:
         print(f"{p_uno_helper.name} not found.")
     return
-    p_scriptforge = Path(uno_paths.get_lo_path(), "scriptforge.py")
-    if p_scriptforge.exists():
-        dest = Path(p_site_dir, "scriptforge.py")
-        try:
-            os.symlink(src=p_scriptforge, dst=dest)
-            print(f"Created system link: {p_scriptforge} -> {dest}")
-        except FileExistsError:
-            print(f"File already exist: {dest}")
-        except OSError:
-            # OSError: [WinError 1314] A required privilege is not held by the client
-            print(f"Unable to create system link for  '{p_scriptforge.name}'. Attempting copy.")
-            shutil.copy2(p_scriptforge, dest)
-            print(f"Copied file: {p_scriptforge} -> {dest}")
-    else:
-        print(f"{p_scriptforge.name} not found.")
+    # p_scriptforge = Path(uno_paths.get_lo_path(), "scriptforge.py")
+    # if p_scriptforge.exists():
+    #     dest = Path(p_site_dir, "scriptforge.py")
+    #     try:
+    #         os.symlink(src=p_scriptforge, dst=dest)
+    #         print(f"Created system link: {p_scriptforge} -> {dest}")
+    #     except FileExistsError:
+    #         print(f"File already exist: {dest}")
+    #     except OSError:
+    #         # OSError: [WinError 1314] A required privilege is not held by the client
+    #         print(f"Unable to create system link for  '{p_scriptforge.name}'. Attempting copy.")
+    #         shutil.copy2(p_scriptforge, dest)
+    #         print(f"Copied file: {p_scriptforge} -> {dest}")
+    # else:
+    #     print(f"{p_scriptforge.name} not found.")
 
 
 def remove_links():
-    p_site_dir = local_paths.get_site_packeges_dir()
+    p_site_dir = local_paths.get_site_packages_dir()
     if p_site_dir is None:
-        print("Unable to find site_packages direct in virtual enviornment")
+        print("Unable to find site_packages direct in virtual environment")
         return
 
     uno_path = Path(p_site_dir, "uno.py")
@@ -105,21 +106,21 @@ def remove_links():
     else:
         print("unohelper.py does not exist in virtual env.")
     return
-    scriptforge_path = Path(p_site_dir, "scriptforge.py")
-    if scriptforge_path.exists():
-        os.remove(scriptforge_path)
-        print("removed scriptforge.py")
-    else:
-        print("scriptforge.py does not exist in virtual env.")
+    # scriptforge_path = Path(p_site_dir, "scriptforge.py")
+    # if scriptforge_path.exists():
+    #     os.remove(scriptforge_path)
+    #     print("removed scriptforge.py")
+    # else:
+    #     print("scriptforge.py does not exist in virtual env.")
 
 
 def main():
     if len(sys.argv) == 2:
         arg = sys.argv[1]
-        if arg == "-r" or arg == "--remove":
+        if arg in ["-r", "--remove"]:
             remove_links()
             return
-        if arg == "-a" or arg == "-add":
+        if arg in ["-a", "-add"]:
             add_links()
             return
     print("for add links use -a or --add\nfor remove use -r or --remove")

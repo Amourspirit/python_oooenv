@@ -121,7 +121,7 @@ def _main() -> int:
 
 def main() -> int:
     os.environ["project_root"] = str(Path(__file__).parent)
-    os.environ["env-site-packages"] = str(local_paths.get_site_packeges_dir())
+    os.environ["env-site-packages"] = str(local_paths.get_site_packages_dir())
     parser = _create_parser("main")
     subparser = parser.add_subparsers(dest="command")
 

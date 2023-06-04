@@ -8,6 +8,7 @@ class SysInfo:
     """System Info related"""
 
     class PlatformEnum(str, Enum):
+        """Platform Enum"""
         UNKNOWN = "Unknown"
         WINDOWS = "Windows"
         MAC = "Darwin"
