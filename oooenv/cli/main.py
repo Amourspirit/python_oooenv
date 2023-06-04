@@ -6,7 +6,7 @@ import argparse
 import sys
 import os
 from pathlib import Path
-from oooenv.cmds import uno_lnk, manage_env_cfg
+from oooenv.cmds import uno_lnk, manage_env_cfg, updater
 from oooenv.utils import local_paths
 
 # region parser
@@ -30,6 +30,8 @@ def _args_process_cmd(a_parser: argparse.ArgumentParser, args: argparse.Namespac
         _args_action_cmd_toggle_env(a_parser=a_parser, args=args)
     elif args.command == "info" and sys.platform == "win32":
         _args_action_cmd_info_win(a_parser=a_parser, args=args)
+    elif args.command == "update" and sys.platform == "win32":
+        _args_action_cmd_update(a_parser=a_parser, args=args)
     else:
         a_parser.print_help()
 
@@ -135,6 +137,51 @@ def _args_action_cmd_toggle_env(a_parser: argparse.ArgumentParser, args: argpars
 # endregion process env commands
 
 
+# region command update
+def _args_cmd_update(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument(
+        "-c",
+        "--is-current",
+        help="Check if the uno cfg is up to date.",
+        action="store_true",
+        dest="uno_up_to_date",
+        default=False,
+    )
+    parser.add_argument(
+        "-u",
+        "--update",
+        help="Updates the uno cfg file.",
+        action="store_true",
+        dest="cfg_update",
+        default=False,
+    )
+
+
+def _args_action_cmd_update(a_parser: argparse.ArgumentParser, args: argparse.Namespace) -> None:
+    if args.uno_up_to_date:
+        if updater.needs_updating():
+            print("Update Needed")
+        else:
+            print("No Update Needed")
+        return
+
+    if args.cfg_update:
+        if not updater.needs_updating():
+            print("No Update Needed")
+            return
+        updater.update_cfg()
+        if manage_env_cfg.is_env_uno_python():
+            # if we are in a uno environment then we need to reload the cfg
+            cfg = manage_env_cfg.read_pyvenv_cfg(fnm="pyvenv_uno.cfg")
+            manage_env_cfg.save_config(cfg=cfg)
+
+        print("Update Complete")
+        return
+
+
+# endregion command update
+
+
 # region Info Windows
 def _args_cmd_info_win(parser: argparse.ArgumentParser) -> None:
     parser.add_argument(
@@ -202,17 +249,7 @@ def main() -> int:
         _args_cmd_link(parser=cmd_link)
 
     if sys.platform == "win32":
-        cmd_env_toggle = subparser.add_parser(
-            name="env",
-            help="Manage Virtual Environment configuration.",
-        )
-        _args_cmd_toggle_evn(parser=cmd_env_toggle)
-        cmd_win_info = subparser.add_parser(
-            name="info",
-            help="LibreOffice information.",
-        )
-        _args_cmd_info_win(parser=cmd_win_info)
-
+        _add_windows_sub_parsers(subparser)
     # endregion OS Specific Commands
 
     # region Read Args
@@ -224,6 +261,24 @@ def main() -> int:
 
     _args_process_cmd(a_parser=parser, args=args)
     return 0
+
+
+def _add_windows_sub_parsers(subparser):
+    cmd_env_toggle = subparser.add_parser(
+        name="env",
+        help="Manage Virtual Environment configuration.",
+    )
+    _args_cmd_toggle_evn(parser=cmd_env_toggle)
+    cmd_win_info = subparser.add_parser(
+        name="info",
+        help="LibreOffice information.",
+    )
+    _args_cmd_info_win(parser=cmd_win_info)
+    cmd_win_update = subparser.add_parser(
+        name="update",
+        help="Manage updating of cfg files.",
+    )
+    _args_cmd_update(parser=cmd_win_update)
 
 
 if __name__ == "__main__":

@@ -41,11 +41,18 @@ In Windows the virtual environment configuration file is manipulated.
 
 The Follow command toggles between original configuration and UNO environment configuration.
 
-```ps
+```powershell
 oooenv env -t
 ```
 
-If virtual environment is managed by Poetry then it will be necessary to toggle into original config before running
-`poetry update`.
+To update the configuration to match the installed verison of LibreOffice's python.
+
+This command should not be run until `oooenv env -t` has be run at least once.
+
+```powershell
+oooenv update --update
+```
+
+If virtual environment is managed by Poetry then it will be necessary to toggle into original config before running `poetry update`.
 
 When updates are done just run command again to toggle back to UNO environment configuration.

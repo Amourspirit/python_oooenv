@@ -3,7 +3,7 @@ import os
 import sys
 import subprocess
 from pathlib import Path
-from typing import NamedTuple
+from typing import Dict, NamedTuple, cast
 from ..utils import local_paths
 
 # from ..lib.connect import LoSocketStart
@@ -47,7 +47,7 @@ def get_uno_python_ver() -> Version:
     return Version(major=int(major), minor=int(minor), revision=int(rev))
 
 
-def read_pyvenv_cfg(fnm: str = "pyvenv.cfg") -> dict:
+def read_pyvenv_cfg(fnm: str = "pyvenv.cfg") -> Dict[str, str]:
     pyvenv_cfg = _get_pyvenv_cfg_path(fnm=fnm)
     result = {}
     with open(pyvenv_cfg, "r") as file:
@@ -62,6 +62,27 @@ def read_pyvenv_cfg(fnm: str = "pyvenv.cfg") -> dict:
             key, value = row.split("=")
             result[key.strip()] = value.strip()
     return result
+
+
+def get_libreoffice_py_ver_from_cfg(fnm: str = "pyvenv_uno.cfg") -> Version:
+    """
+    Gets LibreOffice Python Version from passed in cfg file.
+
+    Args:
+        fnm (str, optional): Config to get version from. Defaults to "pyvenv_uno.cfg".
+
+    Raises:
+        ValueError: if version_info not found in cfg.
+
+    Returns:
+        Version: Version of LibreOffice Python found in cfg.
+    """
+    cfg = read_pyvenv_cfg(fnm=fnm)
+    version_info = cast(str, cfg.get("version_info", ""))
+    if not version_info:
+        raise ValueError(f"version_info not found in {fnm}")
+    major, minor, revision, _ = version_info.split(".", maxsplit=3)
+    return Version(major=int(major), minor=int(minor), revision=int(revision))
 
 
 def is_env_uno_python(cfg: dict | None = None) -> bool:
@@ -84,7 +105,7 @@ def backup_cfg() -> None:
     local_paths.copy_file(src=src, dst=dst)
 
 
-def _save_config(cfg: dict, fnm: str = "pyvenv.cfg"):
+def save_config(cfg: Dict[str, str], fnm: str = "pyvenv.cfg"):
     lst = [f"{k} = {v}" for k, v in cfg.items()]
     if lst:
         lst.append("")
@@ -117,7 +138,7 @@ def toggle_cfg(suffix: str = "") -> None:
 
     src = env_path / "pyvenv_orig.cfg"
     if not src.exists():
-        _save_config(cfg=cfg, fnm="pyvenv_orig.cfg")
+        save_config(cfg=cfg, fnm="pyvenv_orig.cfg")
 
     uno_cfg = env_path / "pyvenv_uno.cfg"
     if not uno_cfg.exists():
@@ -141,7 +162,7 @@ def _set_config_save(cfg):
     cfg["base-prefix"] = f"{hm}\\python-core-{ver}"
     cfg["base-exec-prefix"] = f"{hm}\\python-core-{ver}"
     cfg["base-executable"] = f"{hm}\\python.exe"
-    _save_config(cfg=cfg, fnm="pyvenv_uno.cfg")
+    save_config(cfg=cfg, fnm="pyvenv_uno.cfg")
 
 
 def _get_lo_path() -> str:
