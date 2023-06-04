@@ -108,14 +108,6 @@ def _args_cmd_toggle_evn(parser: argparse.ArgumentParser) -> None:
         dest="custom_env",
         required=False,
     )
-    parser.add_argument(
-        "-v",
-        "--version",
-        help="Displays the current version of LiberOffice Python. This is parsed from LibreOffice Python executable.",
-        action="store_true",
-        dest="lo_py_version",
-        default=False,
-    )
 
 
 def _args_action_cmd_toggle_env(a_parser: argparse.ArgumentParser, args: argparse.Namespace) -> None:
