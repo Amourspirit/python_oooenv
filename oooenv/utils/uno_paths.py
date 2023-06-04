@@ -34,11 +34,12 @@ def get_soffice_install_path() -> Path:
     Returns:
         Path: install as Path.
     """
+    # sourcery skip: assign-if-exp, extract-duplicate-method, extract-method, hoist-statement-from-if, inline-immediately-returned-variable, low-code-quality
     global _INSTALL_PATH
     if _INSTALL_PATH is not None:
         return _INSTALL_PATH
     if PLATFORM == SysInfo.PlatformEnum.WINDOWS:
-        # get the path location from registery
+        # get the path location from Registry
         value = ""
         for _key in (
             # LibreOffice 3.4.5,6,7 on Windows
@@ -50,23 +51,23 @@ def get_soffice_install_path() -> Path:
                 value = winreg.QueryValue(winreg.HKEY_LOCAL_MACHINE, _key)
             except Exception as detail:
                 value = ""
-                _errMess = "%s" % detail
+                # _errMess = "%s" % detail
             else:
                 break  # first existing key will do
         if value != "":
             _INSTALL_PATH = Path("\\".join(value.split("\\")[:-1]))  # drop the program
             return _INSTALL_PATH
 
-        # failed to get path from registery. Going Manual
+        # failed to get path from Registry. Going Manual
         soffice = "soffice.exe"
         p_sf = Path(os.environ["PROGRAMFILES"], "LibreOffice", "program", soffice)
-        if p_sf.exists() is False or p_sf.is_file() is False:
+        if not p_sf.exists() or not p_sf.is_file():
             p_sf = Path(os.environ["PROGRAMFILES(X86)"], "LibreOffice", "program", soffice)
-        if p_sf.exists() is False or p_sf.is_file() is False:
+        if not p_sf.exists() or not p_sf.is_file():
             # perhaps running a developer version.
             # C:\Program Files\LibreOfficeDev 7\program
             p_sf = Path(os.environ["PROGRAMFILES"], "LibreOfficeDev 7", "program", soffice)
-        if p_sf.exists() is False or p_sf.is_file() is False:
+        if not p_sf.exists() or not p_sf.is_file():
             p_sf = Path(os.environ["PROGRAMFILES(X86)"], "LibreOfficeDev 7", "program", soffice)
         if not p_sf.exists():
             raise FileNotFoundError(f"LibreOffice '{p_sf}' not found.")
@@ -134,10 +135,11 @@ def get_uno_path() -> Path:
     Returns:
         Path: First found path.
     """
+    # sourcery skip: extract-duplicate-method
     if PLATFORM == SysInfo.PlatformEnum.WINDOWS:
 
         p_uno = Path(os.environ["PROGRAMFILES"], "LibreOffice", "program")
-        if p_uno.exists() is False or p_uno.is_dir() is False:
+        if not p_uno.exists() or not p_uno.is_dir():
             p_uno = Path(os.environ["PROGRAMFILES(X86)"], "LibreOffice", "program")
         if not p_uno.exists():
             raise FileNotFoundError("Uno Source Dir not found.")
@@ -188,7 +190,7 @@ def get_lo_path() -> Path:
                 p_sf = Path(s).parent
         if p_sf is None:
             p_sf = Path("/usr/bin/soffice")
-            if p_sf.exists() is False or p_sf.is_file() is False:
+            if not p_sf.exists() or not p_sf.is_file():
                 raise FileNotFoundError("LibreOffice Source Dir not found.")
             p_sf = p_sf.parent
 
@@ -217,16 +219,15 @@ def get_lo_python_ex() -> str:
     Returns:
         str: file location of python executable.
     """
-    if PLATFORM == SysInfo.PlatformEnum.WINDOWS:
-        p = Path(get_lo_path(), "python.exe")
-
-        if not p.exists():
-            raise FileNotFoundError("LibreOffice python executable not found.")
-        if not p.is_file():
-            raise NotADirectoryError("LibreOffice  python executable is not a file")
-        return str(p)
-    else:
+    if PLATFORM != SysInfo.PlatformEnum.WINDOWS:
         return sys.executable
+    p = Path(get_lo_path(), "python.exe")
+
+    if not p.exists():
+        raise FileNotFoundError("LibreOffice python executable not found.")
+    if not p.is_file():
+        raise NotADirectoryError("LibreOffice  python executable is not a file")
+    return str(p)
 
 
 @overload
@@ -241,7 +242,7 @@ def mkdirp(dest_dir: Path) -> None:
 
 def mkdirp(dest_dir: Union[str, os.PathLike]) -> None:
     """
-    Creates path and subpaths not existing.
+    Creates path and subpath not existing.
 
     Args:
         dest_dir (str | PathLike]): PathLike object
