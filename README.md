@@ -4,17 +4,27 @@ This project is strictly for LibreOffice python projects that need to set UNO en
 
 A project as [OOO Development Tools](https://python-ooo-dev-tools.readthedocs.io/en/latest/index.html) would use this project
 
-See also [OOO Development Tools - Develop Docs](https://python-ooo-dev-tools.readthedocs.io/en/latest/dev_docs/dev_notes.html)
+See also:
+
+- [LibreOffice Virtual Environment Guides](https://python-ooo-dev-tools.readthedocs.io/en/latest/guide/virtual_env/index.html)
+- [OOO Development Tools - Develop Docs](https://python-ooo-dev-tools.readthedocs.io/en/latest/dev_docs/dev_notes.html)
+- [LibreOffice Python Script Modern Code Editor Examples](https://github.com/Amourspirit/libreoffice-modern-code-editing-py)
 
 ## Installation
 
 **oooenv** [PyPI](https://pypi.org/project/oooenv)
 
-```
+```shell
 pip install oooenv
 ```
 
 ## Usage
+
+View command options
+
+```shell
+oooenv -h
+```
 
 ### Linux/Mac
 
@@ -23,13 +33,13 @@ is to link the UNO files into virtual environment.
 
 To add UNO links to virtual environment run command:
 
-```sh
+```shell
 oooenv cmd-link -a
 ```
 
 To remove UNO links from virtual environment run command:
 
-```sh
+```shell
 oooenv cmd-link -r
 ```
 
@@ -45,7 +55,7 @@ The Follow command toggles between original configuration and UNO environment co
 oooenv env -t
 ```
 
-To update the configuration to match the installed verison of LibreOffice's python.
+To update the configuration to match the installed version of LibreOffice's python.
 
 This command should not be run until `oooenv env -t` has be run at least once.
 

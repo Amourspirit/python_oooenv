@@ -6,8 +6,9 @@ import argparse
 import sys
 import os
 from pathlib import Path
-from oooenv.cmds import uno_lnk, manage_env_cfg, updater
+from oooenv.cmds import uno_lnk, manage_env_cfg, updater, install
 from oooenv.utils import local_paths
+
 
 # region parser
 
@@ -206,6 +207,14 @@ def _args_cmd_global(parser: argparse.ArgumentParser) -> None:
         dest="show_version",
         default=False,
     )
+    parser.add_argument(
+        "-e",
+        "--editable",
+        help="Install a project in editable mode from the local project path. Similar to pip install -e .",
+        action="store_true",
+        dest="editable",
+        default=False,
+    )
 
 
 def _args_action_global(a_parser: argparse.ArgumentParser, args: argparse.Namespace) -> str | None:
@@ -213,6 +222,11 @@ def _args_action_global(a_parser: argparse.ArgumentParser, args: argparse.Namesp
     if args.show_version:
         # return importlib.metadata.version(__package__ or __name__)
         return importlib.metadata.version("oooenv")
+    if args.editable:
+        if result := install.pip_e():
+            return result
+        else:
+            return "Install Failed for unknown reason."
     return None
 
 
