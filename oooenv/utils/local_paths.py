@@ -102,7 +102,11 @@ def get_virtual_env_path() -> str:
 
     Note:
         If unable to get virtual path from Environment then ``sys.base_exec_prefix`` is returned.
+
+        If ``OOOENV_VIRTUAL_ENV`` environment variable is set in environment then that path is returned.
     """
+    if ooo_env := os.environ.get("OOOENV_VIRTUAL_ENV", None):
+        return ooo_env
     s_path = os.environ.get("VIRTUAL_ENV", None)
     return s_path if s_path is not None else sys.base_exec_prefix
 
@@ -113,7 +117,12 @@ def get_site_packages_dir() -> Union[Path, None]:
 
     Returns:
         Union[Path, None]: site-packages dir if found; Otherwise, None.
+
+    Note:
+        If ``OOOENV_SITE_PACKAGES`` environment variable is set in environment then that path is returned.
     """
+    if site_dir := os.environ.get("OOOENV_SITE_PACKAGES", None):
+        return Path(site_dir)
     v_path = get_virtual_env_path()
     p_site = Path(v_path, "Lib", "site-packages")
     if p_site.exists() and p_site.is_dir():

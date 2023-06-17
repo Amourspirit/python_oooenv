@@ -33,9 +33,16 @@ def get_soffice_install_path() -> Path:
 
     Returns:
         Path: install as Path.
+
+    Note:
+        If `OOOENV_LO_PROGRAM_PATH` is set in the environment, then that path is returned.
     """
     # sourcery skip: assign-if-exp, extract-duplicate-method, extract-method, hoist-statement-from-if, inline-immediately-returned-variable, low-code-quality
     global _INSTALL_PATH
+    if install_pth := os.environ.get("OOOENV_LO_PROGRAM_PATH", ""):
+        # supersede all other methods
+        return Path(install_pth)
+
     if _INSTALL_PATH is not None:
         return _INSTALL_PATH
     if PLATFORM == SysInfo.PlatformEnum.WINDOWS:
@@ -48,7 +55,7 @@ def get_soffice_install_path() -> Path:
             "SOFTWARE\\OpenOffice.org\\UNO\\InstallPath",
         ):
             try:
-                value = winreg.QueryValue(winreg.HKEY_LOCAL_MACHINE, _key)
+                value = winreg.QueryValue(winreg.HKEY_LOCAL_MACHINE, _key)  # type: ignore
             except Exception as detail:
                 value = ""
                 # _errMess = "%s" % detail
@@ -120,6 +127,21 @@ def get_soffice_path() -> Path:
     return Path(get_lo_path(), "soffice")
 
 
+def _get_soffice_which_path() -> Path | None:
+    """
+    Gets the path to soffice using shutil.which
+
+    Usually something like ``/usr/lib/libreoffice/program/soffice``
+    """
+    if link_path := shutil.which("soffice"):
+        relative_path = os.path.realpath(link_path)
+        if os.path.isabs(relative_path):
+            return Path(relative_path)
+        else:
+            return Path(os.path.abspath(relative_path))
+    return None
+
+
 def get_uno_path() -> Path:
     """
     Searches known paths for path that contains uno.py
@@ -134,10 +156,15 @@ def get_uno_path() -> Path:
 
     Returns:
         Path: First found path.
-    """
-    # sourcery skip: extract-duplicate-method
-    if PLATFORM == SysInfo.PlatformEnum.WINDOWS:
 
+    Note:
+        If `OOOENV_LO_UNO_PATH` is set, it will be returned without any checks.
+    """
+    if env_path := os.environ.get("OOOENV_LO_UNO_PATH", ""):
+        # special environment variable, no arguments just return it
+        return Path(env_path)
+
+    if PLATFORM == SysInfo.PlatformEnum.WINDOWS:
         p_uno = Path(os.environ["PROGRAMFILES"], "LibreOffice", "program")
         if not p_uno.exists() or not p_uno.is_dir():
             p_uno = Path(os.environ["PROGRAMFILES(X86)"], "LibreOffice", "program")
@@ -149,12 +176,21 @@ def get_uno_path() -> Path:
     elif PLATFORM == SysInfo.PlatformEnum.MAC:
         return Path("/Applications/LibreOffice.app/Contents/MacOS/soffice")
     else:
-        p_uno = Path("/usr/lib/python3/dist-packages")
-        if not p_uno.exists():
-            raise FileNotFoundError("Uno Source Dir not found.")
-        if not p_uno.is_dir():
-            raise NotADirectoryError("UNO source is not a Directory")
-        return p_uno
+        check_paths = ("/usr/lib/python3/dist-packages", "/usr/lib/libreoffice/program", "/opt/libreoffice/program")
+        p_uno = None
+        for pth in check_paths:
+            p_uno = Path(pth)
+            if p_uno.exists() and p_uno.is_dir() and (p_uno / "uno.py").exists():
+                return p_uno
+        # not found yet.
+        # try using shutil.which to extract the path from the link.
+        if which_path := _get_soffice_which_path():
+            # '/usr/lib/libreoffice/program/soffice'
+            p_uno = which_path.parent
+            if p_uno.exists() and p_uno.is_dir() and (p_uno / "uno.py").exists():
+                return p_uno
+
+    raise FileNotFoundError("Uno Source Dir not found.")
 
 
 def get_lo_path() -> Path:
@@ -171,7 +207,15 @@ def get_lo_path() -> Path:
 
     Returns:
         Path: First found path.
+
+    Note:
+        If `OOOENV_LO_PROGRAM_PATH` is set, it will be returned without any checks.
     """
+    # sourcery skip: assign-if-exp, extract-method, introduce-default-else
+    if lo_path := os.environ.get("OOOENV_LO_PROGRAM_PATH", ""):
+        # special environment variable, no arguments just return it
+        return Path(lo_path)
+
     if PLATFORM == SysInfo.PlatformEnum.WINDOWS:
         return Path(get_soffice_install_path(), "program")
 
@@ -218,7 +262,12 @@ def get_lo_python_ex() -> str:
 
     Returns:
         str: file location of python executable.
+
+    Note:
+        If `OOOENV_LO_PY_EXE` environment variable is set, it will be returned without any checks.
     """
+    if env_path := os.environ.get("OOOENV_LO_PY_EXE", ""):
+        return env_path
     if PLATFORM != SysInfo.PlatformEnum.WINDOWS:
         return sys.executable
     p = Path(get_lo_path(), "python.exe")
