@@ -210,10 +210,10 @@ def _args_cmd_global(parser: argparse.ArgumentParser) -> None:
     parser.add_argument(
         "-e",
         "--editable",
-        help="Install a project in editable mode from the local project path. Similar to pip install -e .",
-        action="store_true",
-        dest="editable",
-        default=False,
+        help="Install a project in editable mode from the local project path. Similar to pip install -e <package>. Defaults to . (the current package itself), but the root folder of any package source can be given (relative or absolute).",
+        action="store",
+        dest="editable_package_path",
+        default=".",
     )
 
 
@@ -222,8 +222,8 @@ def _args_action_global(a_parser: argparse.ArgumentParser, args: argparse.Namesp
     if args.show_version:
         # return importlib.metadata.version(__package__ or __name__)
         return importlib.metadata.version("oooenv")
-    if args.editable:
-        if result := install.pip_e():
+    if args.editable_package_path:
+        if result := install.pip_e(args.editable_package_path):
             return result
         else:
             return "Install Failed for unknown reason."
