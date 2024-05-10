@@ -4,7 +4,7 @@ import os
 from ..utils import local_paths
 
 
-def pip_e() -> str:
+def pip_e(package_path='.') -> str:
     """
     Install root path in virtual environment site-packages directory.
 
@@ -14,7 +14,9 @@ def pip_e() -> str:
         str: Message indicating success or failure. Empty string on failure.
     """
     try:
-        root_path = Path(local_paths.get_virtual_env_path()).parent
+        root_path = Path(local_paths.get_virtual_env_path()).parent / package_path
+        if not root_path.exists():
+            return f"No such package path as: {str(root_path)}"
         site_packages_dir = local_paths.get_site_packages_dir()
         if site_packages_dir is None:
             return ""
