@@ -225,8 +225,7 @@ def _args_action_global(a_parser: argparse.ArgumentParser, args: argparse.Namesp
     if args.editable_package_path:
         if result := install.pip_e(args.editable_package_path):
             return result
-        else:
-            return "Install Failed for unknown reason."
+        return "Install Failed for unknown reason."
     return None
 
 
